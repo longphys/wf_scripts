@@ -47,15 +47,15 @@ void wf_1()
 	timer->Start();
 
 	//neutron-gamma
-	//https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_neutrons.root
+	//https://zenodo.org/records/16788392/files/stilbene_neutrons.root
 
 	//gamma
-	//https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_cs137.root
+	//https://zenodo.org/records/16788392/files/stilbene_cs137.root
 
 	//TFile* file_n_gamma = new TFile("./input/stilbene_neutrons.root", "read");
-	TFile* file_n_gamma = TFile::Open("https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_neutrons.root");
+	TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16788392/files/stilbene_neutrons.root");
 	//TFile* file_gamma = new TFile("./input/stilbene_cs137.root", "read");
-	TFile* file_gamma = TFile::Open("https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_cs137.root");
+	TFile* file_gamma = TFile::Open("https://zenodo.org/records/16788392/files/stilbene_cs137.root");
 	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("tt");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("tt");
 	//tree->Print();
@@ -187,7 +187,7 @@ void wf_1()
 	graph_both->Add(graph_Q_ratio_n_gamma, "AP");
 	graph_both->Add(graph_Q_ratio_gamma, "AP");
 	
-	TFile* file_save_array = new TFile("./output/wf_array.root", "recreate");
+	TFile* file_save_array = new TFile("../wf_files/output/wf_array.root", "recreate");
 	
 	TTree* tree_wf_array = new TTree("wf_array", "Tree of n_wf-element array");
 
@@ -445,7 +445,7 @@ void wf_1()
 	tree_wf_array->Write();
 	file_save_array->Close();
 	
-	TFile* file_save_spectrum = new TFile("./output/wf_out.root" , "recreate");
+	TFile* file_save_spectrum = new TFile("../wf_files/output/wf_out.root" , "recreate");
 	hist_spectrum_n_gamma->Write("spectrum_n_gamma");
 	hist_spectrum_gamma->Write("spectrum_gamma");
 	
