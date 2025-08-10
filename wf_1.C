@@ -46,20 +46,16 @@ void wf_1()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-	//folder
-	//https://drive.google.com/drive/folders/1DTiOCPeVH4pMjVgWWkfm6VhMcA1mP7cq?usp=sharing
-
 	//neutron-gamma
-	//https://drive.google.com/file/d/1L6ywP16zbNJ-wq1Ok08gcYv2zoSzg37G/view?usp=sharing
-	//https://1drv.ms/f/c/870ad2c204e08349/EsLHkAF6O61Jhl1zHsYc2jcB74_NvwuaZKYEKCfNHnqFHA?e=FbOq8j
+	//https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_neutrons.root
 
 	//gamma
-	//https://drive.google.com/file/d/18sBezVlnh7xTwMJ-rkaQTrGU9tymwaeo/view?usp=sharing
+	//https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_cs137.root
 
 	//TFile* file_n_gamma = new TFile("./input/stilbene_neutrons.root", "read");
-	TFile* file_n_gamma = TFile::Open("https://drive.google.com/uc?export=download&id=1L6ywP16zbNJ-wq1Ok08gcYv2zoSzg37G");
+	TFile* file_n_gamma = TFile::Open("https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_neutrons.root");
 	//TFile* file_gamma = new TFile("./input/stilbene_cs137.root", "read");
-	TFile* file_gamma = TFile::Open("https://drive.google.com/uc?export=download&id=18sBezVlnh7xTwMJ-rkaQTrGU9tymwaeo");
+	TFile* file_gamma = TFile::Open("https://raw.githubusercontent.com/longphys/wf_scripts/main/wf_files/input/stilbene_cs137.root");
 	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("tt");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("tt");
 	//tree->Print();
