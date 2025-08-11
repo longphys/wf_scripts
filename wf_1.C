@@ -46,16 +46,10 @@ void wf_1()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-	//neutron-gamma
-	//https://zenodo.org/records/16788392/files/stilbene_neutrons.root
-
-	//gamma
-	//https://zenodo.org/records/16788392/files/stilbene_cs137.root
-
 	//TFile* file_n_gamma = new TFile("./input/stilbene_neutrons.root", "read");
-	TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16788392/files/stilbene_neutrons.root");
+	TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
 	//TFile* file_gamma = new TFile("./input/stilbene_cs137.root", "read");
-	TFile* file_gamma = TFile::Open("https://zenodo.org/records/16788392/files/stilbene_cs137.root");
+	TFile* file_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
 	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("tt");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("tt");
 	//tree->Print();
