@@ -95,7 +95,8 @@ int prueba4() {
         std:: cout <<"processed file: "<< vWfFileList[i] << std:: endl ;
         if (!archive.is_open()) {
             cerr << "Error opening: " << vWfFileList[i] << endl;
-            continue;
+            //continue;
+            return 1;
         }
 
         // Reset variables for each event
