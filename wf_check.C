@@ -15,7 +15,6 @@ double n_wf_height = 1000.;
 
 void wf_check()
 {
-
 	auto timer = new TStopwatch();
 	timer->Start();
 

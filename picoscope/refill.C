@@ -13,7 +13,7 @@
 #include <iostream>
 
 void refill(){
-    TFile* f_mea = new TFile("~/data/wf_files/output/csv_bc404_na22.root", "read");
+    TFile* f_mea = new TFile("~/data/wf_files/input/csv_bc404_na22.root", "read");
     TTree* t_mea = (TTree*)f_mea->Get("wf");
 
     double integral;
@@ -23,7 +23,7 @@ void refill(){
 
     int entries = t_mea->GetEntries();
 
-    TFile* f_out = new TFile("~/data/wf_files/output/out_csv_bc404_na22.root", "recreate");
+    TFile* f_out = new TFile("~/data/wf_files/input/out_csv_bc404_na22.root", "recreate");
     TTree* t_out = new TTree("Events", "Events");
     double amp;
     t_out->Branch("Amplitude", &amp);
