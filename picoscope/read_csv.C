@@ -17,7 +17,7 @@
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
 #define INLIST "list_bc404_na22.txt"
-#define OUTROOT "out_bc404_na22.root"
+#define OUTROOT "~/data/wf_files/output/csv_bc404_na22.root"
 
 using std::fstream;
 using std::string;
@@ -47,7 +47,7 @@ double calculateIntegral(const vector<float>& time, const vector<float>& voltage
     return integral;
 }
 
-int prueba4() {
+int read_csv() {
     // 1. Read file list
     fstream inList(INLIST);
     string line;
