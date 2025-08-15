@@ -40,7 +40,7 @@ int ApplyARC(TH1D* hist, double arc_k, int arc_tau_d)
 const int n_wf = 512;
 double n_wf_height = 1000.;
 
-void wf_1()
+void wf_pre_analyse()
 {
 
 	auto timer = new TStopwatch();

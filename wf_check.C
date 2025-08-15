@@ -13,7 +13,7 @@
 const int n_wf = 512;
 double n_wf_height = 1000.;
 
-void wf_read_array()
+void wf_check()
 {
 
 	auto timer = new TStopwatch();
