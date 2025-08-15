@@ -46,10 +46,14 @@ void wf_1()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-	//TFile* file_n_gamma = new TFile("./input/stilbene_neutrons.root", "read");
-	TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
-	//TFile* file_gamma = new TFile("./input/stilbene_cs137.root", "read");
-	TFile* file_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
+	//Input local files
+	TFile* file_n_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_neutrons.root", "read");
+	TFile* file_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_cs137.root", "read");
+	
+	//Input files from link
+	//TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_neutrons.root?download=1");
+	//TFile* file_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
+
 	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("tt");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("tt");
 	//tree->Print();
@@ -69,7 +73,7 @@ void wf_1()
 	canvas_3->Divide(3,1);
 	//const int n = tree_gamma->GetEntries();
 	//const int n = tree_n_gamma->GetEntries();
-	const int n = 100000;
+	const int n = 10000;
 	// const int n = 10;
 	
 	std::cout << "Number of entries: " << n << "\n";
@@ -181,7 +185,7 @@ void wf_1()
 	graph_both->Add(graph_Q_ratio_n_gamma, "AP");
 	graph_both->Add(graph_Q_ratio_gamma, "AP");
 	
-	TFile* file_save_array = new TFile("../wf_files/output/wf_array.root", "recreate");
+	TFile* file_save_array = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/output/wf_array.root", "recreate");
 	
 	TTree* tree_wf_array = new TTree("wf_array", "Tree of n_wf-element array");
 
@@ -439,7 +443,7 @@ void wf_1()
 	tree_wf_array->Write();
 	file_save_array->Close();
 	
-	TFile* file_save_spectrum = new TFile("../wf_files/output/wf_out.root" , "recreate");
+	TFile* file_save_spectrum = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/output/wf_out.root" , "recreate");
 	hist_spectrum_n_gamma->Write("spectrum_n_gamma");
 	hist_spectrum_gamma->Write("spectrum_gamma");
 	

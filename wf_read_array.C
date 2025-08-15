@@ -19,7 +19,7 @@ void wf_read_array()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-    TFile* file_array = new TFile("./output/wf_array.root", "read");
+    TFile* file_array = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/output/wf_array.root", "read");
 	TTree* tree_array = (TTree*)file_array->Get("wf_array");
     tree_array->Print();
 
@@ -31,7 +31,7 @@ void wf_read_array()
 	TCanvas* canvas_1 = new TCanvas("canvas_1", "canvas_1", 1400, 700);
 	canvas_1->Divide(2,1);
 
-	const int n = 100000;
+	const int n = 20;
 	std::cout << "Number of entries: " << n << "\n";
 	
 	// Histogram min and max

@@ -4,8 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-              "/home/long/geant4/geant4-v11.3.2-install/include/**",
-              "/home/long/root/root-6.36.02-install/include/**",
+              "/home/long/geant4/**",
+              "/home/long/root/**",
               ""
             ],
             "defines": [],
