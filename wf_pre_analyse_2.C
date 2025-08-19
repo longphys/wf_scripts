@@ -46,17 +46,18 @@ void wf_pre_analyse_2()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-	//Input local files
-	//TFile* file_n_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_neutrons.root", "read");
-	//TFile* file_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_cs137.root", "read");
-
+	//! Input local files
 	// TFile* file_n_gamma = new TFile("~/data/wf_files/input/bc404_pu_c13_1.root", "read");
 	TFile* file_n_gamma = new TFile("~/data/wf_files/input/bc404_pu_c13_200ps.root", "read");
 	TFile* file_gamma = new TFile("~/data/wf_files/input/bc404_na22.root", "read");
 	
-	//Input files from link
+	//! Input files from link
 	//TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_neutrons.root?download=1");
 	//TFile* file_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
+	
+	// TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16906274/files/bc404_pu_c13_200ps.root?download=1");
+	// TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16906274/files/bc404_pu_c13_1.root?download=1");
+	// TFile* file_gamma = TFile::Open("https://zenodo.org/records/16906274/files/bc404_na22.root?download=1");
 
 	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("wf");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("wf");
@@ -94,10 +95,10 @@ void wf_pre_analyse_2()
 	int wf_min_view = wf_min;
 	int wf_max_view = wf_max;
 	
-	int wf_charge_total_min = 300;
-	int wf_charge_total_max = 1600;
+	int wf_charge_total_min = 550;
+	int wf_charge_total_max = 1000;
 	
-	int wf_charge_tail_min = 800;
+	int wf_charge_tail_min = 650;
 
 	TH1D* hist_spectrum_n_gamma = new TH1D("spectrum_n_gamma", "spectrum", 500, 0., 100000.);
 	hist_spectrum_n_gamma->GetXaxis()->SetTitle("Amplitude (Channels)");
@@ -111,13 +112,13 @@ void wf_pre_analyse_2()
 	hist_spectrum_gamma->GetXaxis()->CenterTitle();
 	hist_spectrum_gamma->GetYaxis()->CenterTitle();
 	
-	TH2D* hist_Q_ratio_n_gamma = new TH2D("Q-ratio Map n-gamma", "Q-ratio Map n-gamma", 500, 0., 60000., 800, 0., 0.8);
+	TH2D* hist_Q_ratio_n_gamma = new TH2D("Q-ratio Map n-gamma", "Q-ratio Map n-gamma", 500, 0., 60000., 800, 0., 1);
 	hist_Q_ratio_n_gamma->GetXaxis()->SetTitle("Charge (a. unit)");
 	hist_Q_ratio_n_gamma->GetYaxis()->SetTitle("Q-ratio");
 	hist_Q_ratio_n_gamma->GetXaxis()->CenterTitle();
 	hist_Q_ratio_n_gamma->GetYaxis()->CenterTitle();
 	
-	TH2D* hist_Q_ratio_gamma = new TH2D("Q-ratio Map gamma", "Q-ratio Map gamma", 500, 0., 60000., 800, 0., 0.8);
+	TH2D* hist_Q_ratio_gamma = new TH2D("Q-ratio Map gamma", "Q-ratio Map gamma", 500, 0., 60000., 800, 0., 1);
 	hist_Q_ratio_gamma->GetXaxis()->SetTitle("Charge (a. unit)");
 	hist_Q_ratio_gamma->GetYaxis()->SetTitle("Q-ratio");
 	hist_Q_ratio_gamma->GetXaxis()->CenterTitle();
@@ -246,7 +247,7 @@ void wf_pre_analyse_2()
 		}
 
 		// Calculation of the charge
-		// Turn this off to enable amplitude normalization
+		//! Turn this off to enable amplitude normalization
 		hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
 		hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
 
@@ -329,8 +330,8 @@ void wf_pre_analyse_2()
 			hist_spectrum_gamma->Draw();
 		}
 
-		// Turn this on to check each waveforms
-		// Clone for hist_temp or hist_temp_aligned;
+		//! Turn this on to check each waveforms
+		//? Clone for hist_temp or hist_temp_aligned;
 		// TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
     	// name = Form("hist_temp_clone_n_gamma_%d",i);
     	// hist_temp_clone_n_gamma->SetName(name);
@@ -365,7 +366,7 @@ void wf_pre_analyse_2()
 		
 		// canvas_2->Modified();
 		// canvas_2->Update();
-		// Up to here
+		//! Up to here
 		
 		hist_temp_n_gamma->SetDirectory(0);
 		hist_temp_gamma->SetDirectory(0);
