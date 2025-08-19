@@ -47,7 +47,7 @@ double calculateIntegral(const vector<float>& time, const vector<float>& voltage
     return integral;
 }
 
-int read_csv_2() {
+int read_csv_1() {
     // 1. Read file list
     fstream inList(INLIST);
     string line;

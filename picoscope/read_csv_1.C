@@ -17,7 +17,7 @@
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
 #define INLIST "list_bc404_na22.txt"
-#define OUTROOT "~/data/wf_files/input/csv_bc404_na22.root"
+#define OUTROOT "~/data/spectrum_files/input/csv_bc404_na22.root"
 
 using std::fstream;
 using std::string;
@@ -71,15 +71,15 @@ int read_csv_1() {
 
     size_t eventNr = 0;
     double integral = 0.;
-    vector<float> vTraceX;
-    vector<float> vTraceY;
+    vector<float> vTime;
+    vector<float> vVoltage;
 
 
     TFile* outputFile = new TFile(OUTROOT, "recreate");
     TTree* tree = new TTree("wf", "wf");
     tree->Branch("event", &eventNr, "event/I");
-    tree->Branch("traceX", &vTraceX);
-    tree->Branch("traceY", &vTraceY);
+    tree->Branch("Time", &vTime);
+    tree->Branch("Voltage", &vVoltage);
     tree->Branch("integral", &integral, "integral/D");
 
     #ifdef DEBUG
@@ -100,8 +100,8 @@ int read_csv_1() {
         }
 
         // Reset variables for each event
-        vTraceX.clear();
-        vTraceY.clear();
+        vTime.clear();
+        vVoltage.clear();
         int skip = 0;
         integral = 0.0;
         eventNr = i;
@@ -151,8 +151,8 @@ int read_csv_1() {
                     float voltage = stof(fila_actual[idx_voltage]);
                 
                     //printf("%f %f\n", time, voltage);
-                    vTraceX.push_back(time);
-                    vTraceY.push_back(voltage);   
+                    vTime.push_back(time);
+                    vVoltage.push_back(voltage);   
                                   
                 } 
                 catch (...) {
@@ -161,7 +161,7 @@ int read_csv_1() {
             }            
         }
         archive.close();
-        integral = calculateIntegral(vTraceX, vTraceY);
+        integral = calculateIntegral(vTime, vVoltage);
         //printf("%f\n", integral);
 
         // 8. Fill tree
