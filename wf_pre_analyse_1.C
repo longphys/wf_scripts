@@ -69,15 +69,15 @@ void wf_pre_analyse_1()
 	TCanvas* canvas_1 = new TCanvas("canvas_1", "canvas_1", 1400, 700);
 	canvas_1->Divide(2,1);
 	
-	// TCanvas* canvas_2 = new TCanvas("canvas_2", "canvas_2", 1400, 700);
-	// canvas_2->Divide(2,1);
+	TCanvas* canvas_2 = new TCanvas("canvas_2", "canvas_2", 1400, 700);
+	canvas_2->Divide(2,1);
 	
 	TCanvas* canvas_3 = new TCanvas("canvas_3", "canvas_3", 1500, 450);
 	canvas_3->Divide(3,1);
 	//const int n = tree_gamma->GetEntries();
 	//const int n = tree_n_gamma->GetEntries();
-	const int n = 10000;
-	// const int n = 10;
+	const int n = 100000;
+	// const int n = 100;
 	
 	std::cout << "Number of entries: " << n << "\n";
 	
@@ -91,8 +91,8 @@ void wf_pre_analyse_1()
 	int wf_min_view = wf_min;
 	int wf_max_view = wf_max;
 	
-	int wf_charge_total_min = 90;
-	int wf_charge_total_max = 130;
+	int wf_charge_total_min = 10;
+	int wf_charge_total_max = 450;
 	
 	int wf_charge_tail_min = 115;
 	
@@ -141,19 +141,19 @@ void wf_pre_analyse_1()
         std::cerr << "Error: Not enough points to form a cut!" << std::endl;
     }
 
-    TCutG* cut_1 = new TCutG("cut_1", n_cut_1);
-    for (int i = 0; i < n_cut_1; ++i) {
-        cut_1->SetPoint(i, vx_cut_1[i], vy_cut_1[i]);
-    }
-    cut_1->SetLineColor(kRed);
+    // TCutG* cut_1 = new TCutG("cut_1", n_cut_1);
+    // for (int i = 0; i < n_cut_1; ++i) {
+    //     cut_1->SetPoint(i, vx_cut_1[i], vy_cut_1[i]);
+    // }
+    // cut_1->SetLineColor(kRed);
 	
-	TH1D* hist_spectrum_n_gamma = new TH1D("spectrum_n_gamma", "spectrum", 500, 0., 60000.);
+	TH1D* hist_spectrum_n_gamma = new TH1D("spectrum_n_gamma", "spectrum", 500, 0., 30000.);
 	hist_spectrum_n_gamma->GetXaxis()->SetTitle("Amplitude (Channels)");
 	hist_spectrum_n_gamma->GetYaxis()->SetTitle("Count/Channel");
 	hist_spectrum_n_gamma->GetXaxis()->CenterTitle();
 	hist_spectrum_n_gamma->GetYaxis()->CenterTitle();
 	
-	TH1D* hist_spectrum_gamma = new TH1D("spectrum_gamma", "spectrum", 500, 0., 60000.);
+	TH1D* hist_spectrum_gamma = new TH1D("spectrum_gamma", "spectrum", 500, 0., 30000.);
 	hist_spectrum_gamma->GetXaxis()->SetTitle("Amplitude (Channels)");
 	hist_spectrum_gamma->GetYaxis()->SetTitle("Count/Channel");
 	hist_spectrum_gamma->GetXaxis()->CenterTitle();
@@ -256,7 +256,12 @@ void wf_pre_analyse_1()
 		
 		int arc_trigger_bin_n_gamma = ApplyARC(hist_temp_n_gamma, 0.95, 2);
 		int arc_trigger_bin_gamma = ApplyARC(hist_temp_gamma, 0.95, 2);
-		int arc_bin_align_to = 100;
+
+		// std::cout << "arc_trigger_bin_n_gamma = " << arc_trigger_bin_n_gamma << "\n";
+		// std::cout << "arc_trigger_bin_gamma = " << arc_trigger_bin_gamma << "\n";
+		// sleep(1);
+
+		int arc_bin_align_to = 110;
 		int shift_n_gamma = arc_bin_align_to - arc_trigger_bin_n_gamma;
 		int shift_gamma = arc_bin_align_to - arc_trigger_bin_gamma;
 		
@@ -307,25 +312,46 @@ void wf_pre_analyse_1()
 		tree_wf_array->Fill();
 		
 		// Calculation of the charge
+		// Turn this off to enable amplitude normalization
 		hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
 		hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
+
 		double charge_total_n_gamma = 0.;
 		double charge_tail_n_gamma = 0.;
 		double charge_total_gamma = 0.;
 		double charge_tail_gamma = 0.;
 		
+		// fix bins intergration
 		for(int j = wf_charge_total_min; j < wf_charge_total_max; j++)
 		{
-			charge_total_n_gamma += hist_temp_aligned_n_gamma->GetBinContent(j+1);
-			charge_total_gamma += hist_temp_aligned_gamma->GetBinContent(j+1);
-			if(j < wf_charge_tail_min)
-			{}
-			else
+			charge_total_n_gamma = charge_total_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+			charge_total_gamma = charge_total_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+			if(j > wf_charge_tail_min)
 			{
-				charge_tail_n_gamma += hist_temp_aligned_n_gamma->GetBinContent(j+1);
-				charge_tail_gamma += hist_temp_aligned_gamma->GetBinContent(j+1);
+				charge_tail_n_gamma = charge_tail_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+				charge_tail_gamma = charge_tail_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
 			}
 		}
+
+		// bins range by trigger intergration
+		// for(int j = arc_trigger_bin_n_gamma; j < arc_trigger_bin_n_gamma+50; j++)
+		// {
+		// 	charge_total_n_gamma = charge_total_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+		// 	if(j > arc_trigger_bin_n_gamma+15)
+		// 	{
+		// 		charge_tail_n_gamma = charge_tail_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+		// 	}
+		// }
+		
+		// for(int j = arc_trigger_bin_gamma; j < arc_trigger_bin_gamma+50; j++)
+		// {
+		// 	charge_total_gamma = charge_total_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+		// 	if(j > arc_trigger_bin_gamma+15)
+		// 	{
+		// 		charge_tail_gamma = charge_tail_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+		// 	}
+		// }
+
 		double q_ratio_n_gamma = charge_tail_n_gamma/charge_total_n_gamma;
 		double q_ratio_gamma = charge_tail_gamma/charge_total_gamma;
 		
@@ -335,24 +361,22 @@ void wf_pre_analyse_1()
 		// Analyze waveforms and fill spectrum
 		hist_Q_ratio_n_gamma->Fill(charge_total_n_gamma, q_ratio_n_gamma);
 		graph_Q_ratio_n_gamma->AddPoint(charge_total_n_gamma, q_ratio_n_gamma);
-        if (cut_1->IsInside(charge_total_n_gamma, q_ratio_n_gamma))
-        { //! if (x = energy, y = timediff is inside cutg) return 1
+        // if (cut_1->IsInside(charge_total_n_gamma, q_ratio_n_gamma))
+        // { //! if (x = energy, y = timediff is inside cutg) return 1
 			hist_spectrum_n_gamma->Fill(charge_total_n_gamma);
-        }
-        else
-        {}
+        // }
         
-        if (cut_1->IsInside(charge_total_gamma, q_ratio_gamma))
-        { //! if (x = energy, y = timediff is inside cutg) return 1
-		    if (i < 280000)
-		    {
+        // if (cut_1->IsInside(charge_total_gamma, q_ratio_gamma))
+        // { //! if (x = energy, y = timediff is inside cutg) return 1
+		    // if (i < 280000)
+		    // {
 				hist_spectrum_gamma->Fill(charge_total_gamma);
-			}
-        }
-        //if (i < tree_gamma->GetEntriesFast())
-        //if (i < tree_gamma->GetEntriesFast() & i > 300000)
+			// }
+        // }
+        if (i < tree_gamma->GetEntriesFast())
+        // if (i < tree_gamma->GetEntriesFast() & i > 300000)
         //if (i < 300000 & i > 250000)
-        if (i < 280000)
+        // if (i < 280000)
         {
 			//hist_spectrum_gamma->Fill(charge_total_gamma);
 			hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
@@ -371,42 +395,42 @@ void wf_pre_analyse_1()
 			hist_spectrum_gamma->Draw();
 		}
 		
-		// // Clone for hist_temp or hist_temp_aligned;
-		// //TH1D* hist_temp_clone = (TH1D*)hist_temp->Clone();
-		// TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
-    	// name = Form("hist_temp_clone_n_gamma_%d",i);
-    	// hist_temp_clone_n_gamma->SetName(name);
-    	// hist_temp_clone_n_gamma->SetTitle(name);
-		// hist_temp_clone_n_gamma->SetDirectory(0);
-		// hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		// hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
+		// Clone for hist_temp or hist_temp_aligned;
+		//TH1D* hist_temp_clone = (TH1D*)hist_temp->Clone();
+		TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
+    	name = Form("hist_temp_clone_n_gamma_%d",i);
+    	hist_temp_clone_n_gamma->SetName(name);
+    	hist_temp_clone_n_gamma->SetTitle(name);
+		hist_temp_clone_n_gamma->SetDirectory(0);
+		hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+		hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
 		
-		// TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
-    	// name = Form ("hist_temp_clone_gamma_%d",i);
-    	// hist_temp_clone_gamma->SetName(name);
-    	// hist_temp_clone_gamma->SetTitle(name);
-		// hist_temp_clone_gamma->SetDirectory(0);
-		// hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		// hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
+		TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
+    	name = Form ("hist_temp_clone_gamma_%d",i);
+    	hist_temp_clone_gamma->SetName(name);
+    	hist_temp_clone_gamma->SetTitle(name);
+		hist_temp_clone_gamma->SetDirectory(0);
+		hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+		hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
 		
-		// canvas_2->cd(1);
+		canvas_2->cd(1);
 		
-		// //hist_temp->Draw();
-		// sleep(1);
-		// int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
+		//hist_temp->Draw();
+		sleep(1);
+		int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
 		
-        // hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        // hist_temp_clone_n_gamma->SetLineWidth(1);
-		// hist_temp_clone_n_gamma->Draw("same");
+        hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+        hist_temp_clone_n_gamma->SetLineWidth(1);
+		hist_temp_clone_n_gamma->Draw("same");
 		
 		
-		// canvas_2->cd(2);
-        // hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        // hist_temp_clone_gamma->SetLineWidth(1);
-		// hist_temp_clone_gamma->Draw("same");
+		canvas_2->cd(2);
+        hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+        hist_temp_clone_gamma->SetLineWidth(1);
+		hist_temp_clone_gamma->Draw("same");
 		
-		// canvas_2->Modified();
-		// canvas_2->Update();
+		canvas_2->Modified();
+		canvas_2->Update();
 		
 		hist_temp_n_gamma->SetDirectory(0);
 		hist_temp_gamma->SetDirectory(0);
@@ -422,10 +446,10 @@ void wf_pre_analyse_1()
 		{	
 			canvas_3->cd(1);
 			hist_Q_ratio_n_gamma->Draw();
-			cut_1->Draw("same");
+			// cut_1->Draw("same");
 			canvas_3->cd(2);
 			hist_Q_ratio_gamma->Draw();
-			cut_1->Draw("same");
+			// cut_1->Draw("same");
 			canvas_3->cd(3);
 			graph_both->Draw("a");
 			

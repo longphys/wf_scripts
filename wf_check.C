@@ -18,7 +18,7 @@ void wf_check()
 	auto timer = new TStopwatch();
 	timer->Start();
 
-    TFile* file_array = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/output/wf_array.root", "read");
+    TFile* file_array = new TFile("/home/long/data/wf_files/output/wf_array.root", "read");
 	TTree* tree_array = (TTree*)file_array->Get("wf_array");
     tree_array->Print();
 

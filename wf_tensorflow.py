@@ -9,7 +9,8 @@ from sklearn.metrics import roc_curve, auc
 # 1. Load Data from ROOT
 # ----------------------
 print("Loading data from ROOT file...")
-file = uproot.open("./output/wf_array.root")
+file = uproot.open("https://zenodo.org/records/16903129/files/wf_array.root?download=1")
+
 tree = file["wf_array"]
 
 wf_n_gamma = tree["wf_n_gamma"].array(library="np")  # shape: (N, 512)
