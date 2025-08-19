@@ -16,6 +16,9 @@
 
 #include <iostream>
 
+#define DRAW_EACH_WF
+#define UN_NORMALIZE_WF
+
 int ApplyARC(TH1D* hist, double arc_k, int arc_tau_d) 
 {
     // Returns trigger bin index based on ARC maximum
@@ -247,9 +250,11 @@ void wf_pre_analyse_2()
 		}
 
 		// Calculation of the charge
-		//! Turn this off to enable amplitude normalization
-		hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
-		hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
+		#ifdef UN_NORMALIZE_WF
+			//! Turn this off to enable amplitude normalization
+			hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
+			hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
+		#endif
 
 		double charge_total_n_gamma = 0.;
 		double charge_tail_n_gamma = 0.;
@@ -330,44 +335,46 @@ void wf_pre_analyse_2()
 			hist_spectrum_gamma->Draw();
 		}
 
-		//! Turn this on to check each waveforms
-		//? Clone for hist_temp or hist_temp_aligned;
-		// TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
-    	// name = Form("hist_temp_clone_n_gamma_%d",i);
-    	// hist_temp_clone_n_gamma->SetName(name);
-    	// hist_temp_clone_n_gamma->SetTitle(name);
-		// hist_temp_clone_n_gamma->SetDirectory(0);
-		// hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		// hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
-		
-		// TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
-    	// name = Form ("hist_temp_clone_gamma_%d",i);
-    	// hist_temp_clone_gamma->SetName(name);
-    	// hist_temp_clone_gamma->SetTitle(name);
-		// hist_temp_clone_gamma->SetDirectory(0);
-		// hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		// hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
-		
-		// canvas_2->cd(1);
-		
-		// //hist_temp->Draw();
-		// sleep(1);
-		// int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
-		
-        // hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        // hist_temp_clone_n_gamma->SetLineWidth(1);
-		// hist_temp_clone_n_gamma->Draw("same");
-		
-		
-		// canvas_2->cd(2);
-        // hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        // hist_temp_clone_gamma->SetLineWidth(1);
-		// hist_temp_clone_gamma->Draw("same");
-		
-		// canvas_2->Modified();
-		// canvas_2->Update();
-		//! Up to here
-		
+		#ifdef DRAW_EACH_WF
+			//! Turn this on to check each waveforms
+			//? Clone for hist_temp or hist_temp_aligned;
+			TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
+			name = Form("hist_temp_clone_n_gamma_%d",i);
+			hist_temp_clone_n_gamma->SetName(name);
+			hist_temp_clone_n_gamma->SetTitle(name);
+			hist_temp_clone_n_gamma->SetDirectory(0);
+			hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+			hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
+			
+			TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
+			name = Form ("hist_temp_clone_gamma_%d",i);
+			hist_temp_clone_gamma->SetName(name);
+			hist_temp_clone_gamma->SetTitle(name);
+			hist_temp_clone_gamma->SetDirectory(0);
+			hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+			hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
+			
+			canvas_2->cd(1);
+			
+			//hist_temp->Draw();
+			sleep(1);
+			int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
+			
+			hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+			hist_temp_clone_n_gamma->SetLineWidth(1);
+			hist_temp_clone_n_gamma->Draw("same");
+			
+			
+			canvas_2->cd(2);
+			hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+			hist_temp_clone_gamma->SetLineWidth(1);
+			hist_temp_clone_gamma->Draw("same");
+			
+			canvas_2->Modified();
+			canvas_2->Update();
+			//! Up to here
+		#endif
+
 		hist_temp_n_gamma->SetDirectory(0);
 		hist_temp_gamma->SetDirectory(0);
 		hist_temp_aligned_n_gamma->SetDirectory(0);
