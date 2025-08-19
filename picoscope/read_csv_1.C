@@ -16,8 +16,8 @@
 #define LINES_TO_SKIP 3
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
-#define INLIST "list_bc404_na22.txt"
-#define OUTROOT "~/data/spectrum_files/input/csv_bc404_na22.root"
+#define INLIST "/home/long/scripts/wf_scripts/picoscope/list_bc404_pu_c13_200ps.txt"
+#define OUTROOT "~/data/wf_files/input/bc404_pu_c13_200ps.root"
 
 using std::fstream;
 using std::string;

@@ -37,25 +37,37 @@ int ApplyARC(TH1D* hist, double arc_k, int arc_tau_d)
     return trigger_index;  // bin index of aligned pulse
 }
 
-//const int n_wf = 512;
-const int n_wf = 2031;
+const int n_wf = 2000;
 double n_wf_height = 1000.;
 
 void wf_pre_analyse_2()
 {
+
 	auto timer = new TStopwatch();
 	timer->Start();
 
 	//Input local files
-	TFile* file_gamma = new TFile("~/data/spectrum_files/input/csv_bc404_na22.root", "read");
+	//TFile* file_n_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_neutrons.root", "read");
+	//TFile* file_gamma = new TFile("/mnt/c/Users/Long/Desktop/data/wf_files/input/stilbene_cs137.root", "read");
 
+	// TFile* file_n_gamma = new TFile("~/data/wf_files/input/bc404_pu_c13_1.root", "read");
+	TFile* file_n_gamma = new TFile("~/data/wf_files/input/bc404_pu_c13_200ps.root", "read");
+	TFile* file_gamma = new TFile("~/data/wf_files/input/bc404_na22.root", "read");
+	
+	//Input files from link
+	//TFile* file_n_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_neutrons.root?download=1");
+	//TFile* file_gamma = TFile::Open("https://zenodo.org/records/16795081/files/stilbene_cs137.root?download=1");
+
+	TTree* tree_n_gamma = (TTree*)file_n_gamma->Get("wf");
 	TTree* tree_gamma = (TTree*)file_gamma->Get("wf");
-	tree_gamma->Print();
-
-	std::vector <float> *time_gamma = 0;
-	std::vector <float> *voltage_gamma = 0;
-	tree_gamma->SetBranchAddress("Time", &time_gamma);
-	tree_gamma->SetBranchAddress("Voltage", &voltage_gamma);
+	//tree->Print();
+	
+	std::vector<float>* time_n_gamma = nullptr;
+	std::vector<float>* time_gamma   = nullptr;
+	// UShort_t time_n_gamma[n_wf];
+	// UShort_t time_gamma[n_wf];
+	tree_n_gamma->SetBranchAddress("Voltage", &time_n_gamma);
+	tree_gamma->SetBranchAddress("Voltage", &time_gamma);
 	
 	TCanvas* canvas_1 = new TCanvas("canvas_1", "canvas_1", 1400, 700);
 	canvas_1->Divide(2,1);
@@ -67,8 +79,8 @@ void wf_pre_analyse_2()
 	canvas_3->Divide(3,1);
 	//const int n = tree_gamma->GetEntries();
 	//const int n = tree_n_gamma->GetEntries();
-	const int n = 10000;
-	// const int n = 10;
+	const int n = 65000;
+	// const int n = 100;
 	
 	std::cout << "Number of entries: " << n << "\n";
 	
@@ -82,18 +94,18 @@ void wf_pre_analyse_2()
 	int wf_min_view = wf_min;
 	int wf_max_view = wf_max;
 	
-	int wf_charge_total_min = 90;
-	int wf_charge_total_max = 130;
+	int wf_charge_total_min = 300;
+	int wf_charge_total_max = 1600;
 	
-	int wf_charge_tail_min = 115;
-	
-	TH1D* hist_spectrum_n_gamma = new TH1D("spectrum_n_gamma", "spectrum", 500, 0., 60000.);
+	int wf_charge_tail_min = 800;
+
+	TH1D* hist_spectrum_n_gamma = new TH1D("spectrum_n_gamma", "spectrum", 500, 0., 100000.);
 	hist_spectrum_n_gamma->GetXaxis()->SetTitle("Amplitude (Channels)");
 	hist_spectrum_n_gamma->GetYaxis()->SetTitle("Count/Channel");
 	hist_spectrum_n_gamma->GetXaxis()->CenterTitle();
 	hist_spectrum_n_gamma->GetYaxis()->CenterTitle();
 	
-	TH1D* hist_spectrum_gamma = new TH1D("spectrum_gamma", "spectrum", 500, 0., 60000.);
+	TH1D* hist_spectrum_gamma = new TH1D("spectrum_gamma", "spectrum", 500, 0., 100000.);
 	hist_spectrum_gamma->GetXaxis()->SetTitle("Amplitude (Channels)");
 	hist_spectrum_gamma->GetYaxis()->SetTitle("Count/Channel");
 	hist_spectrum_gamma->GetXaxis()->CenterTitle();
@@ -127,16 +139,7 @@ void wf_pre_analyse_2()
 	graph_both->GetYaxis()->CenterTitle();
 	graph_both->Add(graph_Q_ratio_n_gamma, "AP");
 	graph_both->Add(graph_Q_ratio_gamma, "AP");
-	
-	TFile* file_save_array = new TFile("~/data/wf_files/output/wf_array_2.root", "recreate");
-	
-	TTree* tree_wf_array = new TTree("wf_array", "Tree of n_wf-element array");
 
-	double wf_array_n_gamma[n_wf];
-	double wf_array_gamma[n_wf];
-	tree_wf_array->Branch("wf_n_gamma", wf_array_n_gamma, Form("wf_n_gamma[%d]/D", n_wf));
-	tree_wf_array->Branch("wf_gamma", wf_array_gamma, Form("wf_gamma[%d]/D", n_wf));
-	
 	TString name;
 	for (int i = 0; i < n; i++)
 	{	
@@ -161,42 +164,48 @@ void wf_pre_analyse_2()
 		}
     	name = Form("hist_temp_n_gamma_%d",i);
 		TH1D* hist_temp_n_gamma = new TH1D(name, name, wf_max-wf_min, wf_min, wf_max);
+		tree_n_gamma->GetEntry(i);
 		
     	name = Form("hist_temp_gamma_%d",i);
 		TH1D* hist_temp_gamma = new TH1D(name, name, wf_max-wf_min, wf_min, wf_max);
 		tree_gamma->GetEntry(i);
 		
 		// Get and fill waveforms
-		/*
 		for (int j = 0; j < wf_max-wf_min; j++)
 		{
-			double inverse_height = 4096-time_n_gamma[j+wf_min];
+			// double inverse_height = (*time_n_gamma)[j+wf_min];
+			double inverse_height = 200-(*time_n_gamma)[j+wf_min];
 			hist_temp_n_gamma->SetBinContent(j+1, inverse_height);
 			//hist_temp_n_gamma->SetBinContent(j+1, time_n_gamma[j+wf_min]);
-		}*/
+		}
 		
 		for (int j = 0; j < wf_max-wf_min; j++)
 		{
-			//double inverse_height = 4096-time_gamma->at(j+wf_min);
-			double inverse_height = voltage_gamma->at(j+wf_min);
+			// double inverse_height = (*time_gamma)[j+wf_min];
+			double inverse_height = 200-(*time_gamma)[j+wf_min];
 			hist_temp_gamma->SetBinContent(j+1, inverse_height);
 			//hist_temp_gamma->SetBinContent(j+1, time_gamma[j+wf_min]);
 		}
 		
 		int maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
 		double scale_factor_n_gamma = n_wf_height/(maximum_n_gamma);
-		//hist_temp_n_gamma->Scale(scale_factor_n_gamma, "noSW2");
+		hist_temp_n_gamma->Scale(scale_factor_n_gamma, "noSW2");
 		
 		int maximum_gamma = hist_temp_gamma->GetMaximum();
 		double scale_factor_gamma = n_wf_height/(maximum_gamma);
-		//hist_temp_gamma->Scale(scale_factor_gamma, "noSW2");
-		
+		hist_temp_gamma->Scale(scale_factor_gamma, "noSW2");
+
 		// Apply ARC
 		// std::cout << "ARC_bin_index = " << ApplyARC(hist_temp, 0.95, 2) << "\n";
 		
 		int arc_trigger_bin_n_gamma = ApplyARC(hist_temp_n_gamma, 0.95, 2);
 		int arc_trigger_bin_gamma = ApplyARC(hist_temp_gamma, 0.95, 2);
-		int arc_bin_align_to = 100;
+
+		// std::cout << "arc_trigger_bin_n_gamma = " << arc_trigger_bin_n_gamma << "\n";
+		// std::cout << "arc_trigger_bin_gamma = " << arc_trigger_bin_gamma << "\n";
+		// sleep(1);
+
+		int arc_bin_align_to = 600;
 		int shift_n_gamma = arc_bin_align_to - arc_trigger_bin_n_gamma;
 		int shift_gamma = arc_bin_align_to - arc_trigger_bin_gamma;
 		
@@ -235,37 +244,48 @@ void wf_pre_analyse_2()
         		hist_temp_aligned_gamma->SetBinContent(newbin, hist_temp_gamma->GetBinContent(j));
 			}
 		}
-		
-		// Save waveforms as arrays of 512 elements into a file
-		for(int j = 0; j < wf_max; j++)
-		{	
-			wf_array_n_gamma[j] = hist_temp_aligned_n_gamma->GetBinContent(j);
-			wf_array_gamma[j] = hist_temp_aligned_gamma->GetBinContent(j);
-			//std::cout << "wf_array_n_gamma[" << j << "] = " << wf_array_n_gamma[j] << "\n";
-			//std::cout << "wf_array_gamma[" << j << "] = " << wf_array_gamma[j] << "\n";
-		}
-		tree_wf_array->Fill();
-		
+
 		// Calculation of the charge
-		//hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
-		//hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
+		// Turn this off to enable amplitude normalization
+		hist_temp_aligned_n_gamma->Scale(1/scale_factor_n_gamma, "noSW2");
+		hist_temp_aligned_gamma->Scale(1/scale_factor_gamma, "noSW2");
+
 		double charge_total_n_gamma = 0.;
 		double charge_tail_n_gamma = 0.;
 		double charge_total_gamma = 0.;
 		double charge_tail_gamma = 0.;
 		
+		// fix bins intergration
 		for(int j = wf_charge_total_min; j < wf_charge_total_max; j++)
 		{
-			charge_total_n_gamma += hist_temp_aligned_n_gamma->GetBinContent(j+1);
-			charge_total_gamma += hist_temp_aligned_gamma->GetBinContent(j+1);
-			if(j < wf_charge_tail_min)
-			{}
-			else
+			charge_total_n_gamma = charge_total_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+			charge_total_gamma = charge_total_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+			if(j > wf_charge_tail_min)
 			{
-				charge_tail_n_gamma += hist_temp_aligned_n_gamma->GetBinContent(j+1);
-				charge_tail_gamma += hist_temp_aligned_gamma->GetBinContent(j+1);
+				charge_tail_n_gamma = charge_tail_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+				charge_tail_gamma = charge_tail_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
 			}
 		}
+
+		// bins range by trigger intergration
+		// for(int j = arc_trigger_bin_n_gamma; j < arc_trigger_bin_n_gamma+50; j++)
+		// {
+		// 	charge_total_n_gamma = charge_total_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+		// 	if(j > arc_trigger_bin_n_gamma+15)
+		// 	{
+		// 		charge_tail_n_gamma = charge_tail_n_gamma + hist_temp_aligned_n_gamma->GetBinContent(j+1);
+		// 	}
+		// }
+		
+		// for(int j = arc_trigger_bin_gamma; j < arc_trigger_bin_gamma+50; j++)
+		// {
+		// 	charge_total_gamma = charge_total_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+		// 	if(j > arc_trigger_bin_gamma+15)
+		// 	{
+		// 		charge_tail_gamma = charge_tail_gamma + hist_temp_aligned_gamma->GetBinContent(j+1);
+		// 	}
+		// }
+
 		double q_ratio_n_gamma = charge_tail_n_gamma/charge_total_n_gamma;
 		double q_ratio_gamma = charge_tail_gamma/charge_total_gamma;
 		
@@ -275,13 +295,27 @@ void wf_pre_analyse_2()
 		// Analyze waveforms and fill spectrum
 		hist_Q_ratio_n_gamma->Fill(charge_total_n_gamma, q_ratio_n_gamma);
 		graph_Q_ratio_n_gamma->AddPoint(charge_total_n_gamma, q_ratio_n_gamma);
-		hist_spectrum_n_gamma->Fill(charge_total_n_gamma);
+        // if (cut_1->IsInside(charge_total_n_gamma, q_ratio_n_gamma))
+        // { //! if (x = energy, y = timediff is inside cutg) return 1
+			hist_spectrum_n_gamma->Fill(charge_total_n_gamma);
+        // }
         
-		hist_spectrum_gamma->Fill(charge_total_gamma);
-		
-		//hist_spectrum_gamma->Fill(charge_total_gamma);
-		hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
-		graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
+        // if (cut_1->IsInside(charge_total_gamma, q_ratio_gamma))
+        // { //! if (x = energy, y = timediff is inside cutg) return 1
+		    // if (i < 280000)
+		    // {
+				hist_spectrum_gamma->Fill(charge_total_gamma);
+			// }
+        // }
+        if (i < tree_gamma->GetEntriesFast())
+        // if (i < tree_gamma->GetEntriesFast() & i > 300000)
+        //if (i < 300000 & i > 250000)
+        // if (i < 280000)
+        {
+			//hist_spectrum_gamma->Fill(charge_total_gamma);
+			hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
+			graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
+		}
 		
 		// Draw Histograms
 		if (i == 0)
@@ -294,43 +328,44 @@ void wf_pre_analyse_2()
 			canvas_1->cd(2);
 			hist_spectrum_gamma->Draw();
 		}
-		
+
+		// Turn this on to check each waveforms
 		// Clone for hist_temp or hist_temp_aligned;
-		//TH1D* hist_temp_clone = (TH1D*)hist_temp->Clone();
-		TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
-    	name = Form("hist_temp_clone_n_gamma_%d",i);
-    	hist_temp_clone_n_gamma->SetName(name);
-    	hist_temp_clone_n_gamma->SetTitle(name);
-		hist_temp_clone_n_gamma->SetDirectory(0);
-		//hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		//hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
+		// TH1D* hist_temp_clone_n_gamma = (TH1D*)hist_temp_aligned_n_gamma->Clone();
+    	// name = Form("hist_temp_clone_n_gamma_%d",i);
+    	// hist_temp_clone_n_gamma->SetName(name);
+    	// hist_temp_clone_n_gamma->SetTitle(name);
+		// hist_temp_clone_n_gamma->SetDirectory(0);
+		// hist_temp_clone_n_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+		// hist_temp_clone_n_gamma->GetYaxis()->SetRangeUser(0, 1100);
 		
-		TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
-    	name = Form ("hist_temp_clone_gamma_%d",i);
-    	hist_temp_clone_gamma->SetName(name);
-    	hist_temp_clone_gamma->SetTitle(name);
-		hist_temp_clone_gamma->SetDirectory(0);
-		//hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
-		//hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
+		// TH1D* hist_temp_clone_gamma = (TH1D*)hist_temp_aligned_gamma->Clone();
+    	// name = Form ("hist_temp_clone_gamma_%d",i);
+    	// hist_temp_clone_gamma->SetName(name);
+    	// hist_temp_clone_gamma->SetTitle(name);
+		// hist_temp_clone_gamma->SetDirectory(0);
+		// hist_temp_clone_gamma->GetXaxis()->SetRangeUser(wf_min_view, wf_max_view);
+		// hist_temp_clone_gamma->GetYaxis()->SetRangeUser(0, 1100);
 		
-		canvas_2->cd(1);
+		// canvas_2->cd(1);
 		
-		//hist_temp->Draw();
-		sleep(1);
-		int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
+		// //hist_temp->Draw();
+		// sleep(1);
+		// int colorIndex = i % 50 + 1;  // ROOT has colors 1–50 (looping)
 		
-        hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        hist_temp_clone_n_gamma->SetLineWidth(1);
-		hist_temp_clone_n_gamma->Draw("same");
+        // hist_temp_clone_n_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+        // hist_temp_clone_n_gamma->SetLineWidth(1);
+		// hist_temp_clone_n_gamma->Draw("same");
 		
 		
-		canvas_2->cd(2);
-        hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
-        hist_temp_clone_gamma->SetLineWidth(1);
-		hist_temp_clone_gamma->Draw("same");
+		// canvas_2->cd(2);
+        // hist_temp_clone_gamma->SetLineColorAlpha(colorIndex, 0.05);  // Faint line
+        // hist_temp_clone_gamma->SetLineWidth(1);
+		// hist_temp_clone_gamma->Draw("same");
 		
-		canvas_2->Modified();
-		canvas_2->Update();
+		// canvas_2->Modified();
+		// canvas_2->Update();
+		// Up to here
 		
 		hist_temp_n_gamma->SetDirectory(0);
 		hist_temp_gamma->SetDirectory(0);
@@ -346,8 +381,10 @@ void wf_pre_analyse_2()
 		{	
 			canvas_3->cd(1);
 			hist_Q_ratio_n_gamma->Draw();
+			// cut_1->Draw("same");
 			canvas_3->cd(2);
 			hist_Q_ratio_gamma->Draw();
+			// cut_1->Draw("same");
 			canvas_3->cd(3);
 			graph_both->Draw("a");
 			
@@ -355,7 +392,7 @@ void wf_pre_analyse_2()
 			//legend_1->SetHeader("test", "C");
 			legend_1->SetBorderSize(2);
 			legend_1->AddEntry(hist_Q_ratio_n_gamma, "some neutron source", "p");
-			legend_1->AddEntry(hist_Q_ratio_gamma, "Cs137", "p");
+			legend_1->AddEntry(hist_Q_ratio_gamma, "some gamma source", "p");
 			legend_1->Draw();
 		}
 		graph_both->GetXaxis()->SetRangeUser(
@@ -365,21 +402,6 @@ void wf_pre_analyse_2()
 				hist_Q_ratio_n_gamma->GetYaxis()->GetXmin(), 
 				hist_Q_ratio_n_gamma->GetYaxis()->GetXmax());
 	}
-	
-	tree_wf_array->Write();
-	file_save_array->Close();
-	
-	TFile* file_save_spectrum = new TFile("~/data/wf_files/output/wf_out_2.root" , "recreate");
-	hist_spectrum_n_gamma->Write("spectrum_n_gamma");
-	hist_spectrum_gamma->Write("spectrum_gamma");
-	
-	hist_Q_ratio_n_gamma->Write("q_ratio_n_gamma");
-	hist_Q_ratio_gamma->Write("q_ratio_gamma");
-	
-	graph_both->Write("q_ratio_both");
-	
-	file_save_spectrum->Write();
-	file_save_spectrum->Close();
 	
 	std::cout << "time: " << timer->RealTime() << " seconds \n";
 }
