@@ -16,8 +16,8 @@
 #define LINES_TO_SKIP 3
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
-#define INLIST "/home/long/scripts/wf_scripts/picoscope/list_bc404_pu_c13_200ps.txt"
-#define OUTROOT "~/data/wf_files/input/bc404_pu_c13_200ps.root"
+#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_pu_c13_20250723-0002.txt"
+#define OUTROOT "/home/long/data/wf_files/input/root_files/bc404_pu_c13_20250723-0002.root"
 
 using std::fstream;
 using std::string;
@@ -32,20 +32,6 @@ using std::stof;
 using std::map;
 using std::cerr;
 using std::max;
-
-// Function to calculate the integral (trapezoidal method)
-double calculateIntegral(const vector<float>& time, const vector<float>& voltage) {
-    if (time.size() < 2 || voltage.size() < 2 || time.size() != voltage.size()) 
-        return 0.0;
-    
-    double integral = 0.0;
-    for (size_t i = 1; i < time.size(); ++i) {
-        double dt = time[i] - time[i-1];
-        double v_prom = -(voltage[i] + voltage[i-1]) / 2.0;
-        integral += v_prom * dt;
-    }
-    return integral;
-}
 
 int read_csv_1() {
     // 1. Read file list
@@ -70,7 +56,6 @@ int read_csv_1() {
 
 
     size_t eventNr = 0;
-    double integral = 0.;
     vector<float> vTime;
     vector<float> vVoltage;
 
@@ -80,7 +65,6 @@ int read_csv_1() {
     tree->Branch("event", &eventNr, "event/I");
     tree->Branch("Time", &vTime);
     tree->Branch("Voltage", &vVoltage);
-    tree->Branch("integral", &integral, "integral/D");
 
     #ifdef DEBUG
         TCanvas* cnCommon = new TCanvas("cnCommon", "cnCommon", 700, 700);
@@ -103,7 +87,6 @@ int read_csv_1() {
         vTime.clear();
         vVoltage.clear();
         int skip = 0;
-        integral = 0.0;
         eventNr = i;
         
         // 4. Read headings (skip initial lines)
@@ -161,8 +144,6 @@ int read_csv_1() {
             }            
         }
         archive.close();
-        integral = calculateIntegral(vTime, vVoltage);
-        //printf("%f\n", integral);
 
         // 8. Fill tree
         tree->Fill();

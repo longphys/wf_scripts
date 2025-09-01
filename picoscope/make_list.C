@@ -5,9 +5,9 @@
 
 void make_list() {
     // --- settings ---
-    TString out_txt = "/home/long/scripts/wf_scripts/picoscope/list_bc404_pu_c13_200ps.txt";
-    TString base_dir = "/home/long/data/wf_files/picoscope/picoscope_pu_c13_200ps/";
-    TString prefix   = "238Pu-0002_";
+    TString out_txt = "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_na22_20250723.txt";
+    TString base_dir = "/home/long/data/wf_files/input/picoscope_bc404_na22/20250723/";
+    TString prefix   = "20250723_";
     int first_idx    = 1;
     int last_idx     = 65000;  // change to however many files you have
     TString ext      = ".csv";
