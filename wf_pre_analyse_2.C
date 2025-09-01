@@ -18,6 +18,7 @@
 
 // #define ORIGINAL_WF
 // #define DRAW_EACH_WF
+#define APPLY_AVERAGE
 // #define APPLY_ARC
 #define UN_NORMALIZE_WF
 
@@ -153,21 +154,23 @@ void wf_pre_analyse_2()
 	int wf_charge_total_min = 600;
 	int wf_charge_total_max = 1900;
 	int wf_charge_tail_min = 1200;
-	int wf_charge_tail_min_final = 1500;
-	int wf_charge_tail_min_incre = 100;
+	int wf_charge_tail_min_final = 1800;
+	int wf_charge_tail_min_incre = 5;
 	int times = (wf_charge_tail_min_final-wf_charge_tail_min)/wf_charge_tail_min_incre;
-	std::cout << "times = " << times << "\n";
+	// std::cout << "times = " << times << "\n";
 
 	TString name;
-for (int ii = 0; ii <= times; ii+=wf_charge_tail_min_incre)
+for (int ii = 0; ii < times; ii++)
 {
-wf_charge_tail_min = wf_charge_tail_min + ii*wf_charge_tail_min_incre;
+	std::cout << "iteration: " << ii+1 << "/" << times << "\n";
+	wf_charge_tail_min += wf_charge_tail_min_incre;
+std::cout << "wf_charge_tail_min = " << wf_charge_tail_min << "\n";
 	for (int i = 0; i < n; i++)
 	{	
-		if (i%1000==0)
+		if (i%5000==0)
 		// if (i%50000==0)
 		{
-			std::cout << "Entry No. " << i << "\n";
+			// std::cout << "Entry No. " << i << "\n";
 			
 			canvas_1->cd(1)->Modified();
 			canvas_1->cd(1)->Update();
@@ -217,6 +220,7 @@ wf_charge_tail_min = wf_charge_tail_min + ii*wf_charge_tail_min_incre;
 		#endif
 
 		// Apply average
+		#ifdef APPLY_AVERAGE
 		for (int j = 0; j < wf_max-wf_min; j+=4)
 		{
 			double average_a = 
@@ -243,6 +247,7 @@ wf_charge_tail_min = wf_charge_tail_min + ii*wf_charge_tail_min_incre;
 			hist_temp_gamma->SetBinContent(j+2, average_b);
 			hist_temp_gamma->SetBinContent(j+3, average_b);
 		}
+		#endif
 		
 		int maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
 		double scale_factor_n_gamma = n_wf_height/(maximum_n_gamma);
@@ -341,36 +346,21 @@ wf_charge_tail_min = wf_charge_tail_min + ii*wf_charge_tail_min_incre;
 		// Analyze waveforms and fill spectrum
 		hist_Q_ratio_n_gamma->Fill(charge_total_n_gamma, q_ratio_n_gamma);
 		graph_Q_ratio_n_gamma->AddPoint(charge_total_n_gamma, q_ratio_n_gamma);
-        // if (cut_1->IsInside(charge_total_n_gamma, q_ratio_n_gamma))
-        // { //! if (x = energy, y = timediff is inside cutg) return 1
+
+		if(ii == 0)
+		{
 			hist_spectrum_n_gamma->Fill(charge_total_n_gamma);
-        // }
-        
-        // if (cut_1->IsInside(charge_total_gamma, q_ratio_gamma))
-        // { //! if (x = energy, y = timediff is inside cutg) return 1
-		    // if (i < 280000)
-		    // {
-				hist_spectrum_gamma->Fill(charge_total_gamma);
-			// }
-        // }
-        if (i < tree_gamma->GetEntriesFast())
-        // if (i < tree_gamma->GetEntriesFast() & i > 300000)
-        //if (i < 300000 & i > 250000)
-        // if (i < 280000)
-        {
-			//hist_spectrum_gamma->Fill(charge_total_gamma);
-			hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
-			graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
+			hist_spectrum_gamma->Fill(charge_total_gamma);
 		}
+
+		hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
+		graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
 		
 		// Draw Histograms
-		if (i == 0)
+		if (i == 0 && ii == 0)
 		{
 			canvas_1->cd(1);
 			hist_spectrum_n_gamma->Draw();
-		}
-		if (i == 0)
-		{
 			canvas_1->cd(2);
 			hist_spectrum_gamma->Draw();
 		}
@@ -452,13 +442,26 @@ wf_charge_tail_min = wf_charge_tail_min + ii*wf_charge_tail_min_incre;
 				hist_Q_ratio_n_gamma->GetYaxis()->GetXmax());
 	}
 
+	if(ii==0)
+	{
+		hist_spectrum_n_gamma->Write();
+		hist_spectrum_gamma->Write();
+	}
+	
 	hist_Q_ratio_n_gamma->SetName(Form("n_gamma_%d_%d_tail_%d_%d", wf_charge_total_min, wf_charge_total_max, wf_charge_tail_min, wf_charge_total_max));
-	hist_Q_ratio_gamma->SetName(Form("n_gamma_%d_%d_tail_%d_%d", wf_charge_total_min, wf_charge_total_max, wf_charge_tail_min, wf_charge_total_max));
-	graph_both->SetName(Form("n_gamma_%d_%d_tail_%d_%d", wf_charge_total_min, wf_charge_total_max, wf_charge_tail_min, wf_charge_total_max));
+	hist_Q_ratio_gamma->SetName(Form("gamma_%d_%d_tail_%d_%d", wf_charge_total_min, wf_charge_total_max, wf_charge_tail_min, wf_charge_total_max));
+	graph_both->SetName(Form("both_%d_%d_tail_%d_%d", wf_charge_total_min, wf_charge_total_max, wf_charge_tail_min, wf_charge_total_max));
 
 	hist_Q_ratio_n_gamma->Write();
 	hist_Q_ratio_gamma->Write();
 	graph_both->Write();
+
+	hist_Q_ratio_n_gamma->Reset();
+	hist_Q_ratio_gamma->Reset();
+	// Clear the TMultiGraph
+	graph_Q_ratio_n_gamma->Set(0);
+	graph_Q_ratio_gamma->Set(0);
+	//
 }
 outFile->Close();
 	std::cout << "time: " << timer->RealTime() << " seconds \n";
