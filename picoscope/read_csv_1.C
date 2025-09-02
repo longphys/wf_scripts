@@ -16,8 +16,10 @@
 #define LINES_TO_SKIP 3
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
+// #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_cs137_20250725-0006.txt"
 #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_pu_c13_20250723-0002.txt"
-#define OUTROOT "/home/long/data/wf_files/input/root_files/bc404_pu_c13_20250723-0002.root"
+// #define OUTROOT "/home/long/data/wf_files/input/root_files/bc404_cs137_20250725-0006.root"
+#define OUTROOT "./test_wf.root"
 
 using std::fstream;
 using std::string;
@@ -58,6 +60,7 @@ int read_csv_1() {
     size_t eventNr = 0;
     vector<float> vTime;
     vector<float> vVoltage;
+    double integral;
 
 
     TFile* outputFile = new TFile(OUTROOT, "recreate");
@@ -65,6 +68,7 @@ int read_csv_1() {
     tree->Branch("event", &eventNr, "event/I");
     tree->Branch("Time", &vTime);
     tree->Branch("Voltage", &vVoltage);
+    tree->Branch("Integral", &integral, "Integral/D");
 
     #ifdef DEBUG
         TCanvas* cnCommon = new TCanvas("cnCommon", "cnCommon", 700, 700);
@@ -141,13 +145,17 @@ int read_csv_1() {
                 catch (...) {
                     
                 }
+            }
+            for (int iii = 0; iii <vVoltage.size(); iii++)
+            {
+                integral+=190.-vVoltage.at(iii);
             }            
         }
         archive.close();
 
         // 8. Fill tree
         tree->Fill();
-        
+        integral = 0.;
     }
 
     // 9. Save and close
