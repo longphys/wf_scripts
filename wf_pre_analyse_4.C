@@ -16,15 +16,11 @@
 
 #include <iostream>
 
-// #define ORIGINAL_WF
+// #define ORIGINAL_WF //! only for checking the waveform, all analysis will fail.
 // #define DRAW_EACH_WF
 #define APPLY_FIXED_AVERAGE
 // #define APPLY_MOVING_AVERAGE
 // #define NORMALIZE_WF
-#define HEIGHT_THRESHOLD
-double height_threshold_n_gamma = 10.;
-double height_threshold_gamma = 10.;
-// #define USE_SIGNAL_HEIGHT // Use the pulse height to draw the 2D histograms instead of the integral.
 
 //! Short window
 const int n_wf = 2000;
@@ -47,7 +43,7 @@ int wf_max_view = wf_max;
 #endif
 
 
-void wf_pre_analyse_3()
+void wf_pre_analyse_4()
 {
 	auto timer = new TStopwatch();
 	timer->Start();
@@ -91,8 +87,10 @@ void wf_pre_analyse_3()
 	tree_n_gamma->SetBranchAddress("Voltage", &voltage_n_gamma);
 	tree_gamma->SetBranchAddress("Voltage", &voltage_gamma);
 	
+	#ifdef DRAW_EACH_WF
 	TCanvas* canvas_2 = new TCanvas("canvas_2", "canvas_2", 1400, 700);
 	canvas_2->Divide(2,1);
+	#endif
 	
 	//const int n = tree_gamma->GetEntries();
 	//const int n = tree_n_gamma->GetEntries();
@@ -116,29 +114,35 @@ void wf_pre_analyse_3()
 	std::vector<double> integral_tail_n_gamma;
 	std::vector<double> integral_tail_gamma;
 	
-	double min_total;
-	std::vector<double> min_tail;
-	double max;
+	double maximum_n_gamma;
+	double maximum_gamma;
+	double maximum_n_gamma_pos;
+	double maximum_gamma_pos;
 	
 	outTree->Branch("t_n_gamma", &time_n_gamma); // Time values of a waveform
 	outTree->Branch("t_gamma", &time_gamma);
 	outTree->Branch("v_n_gamma", &voltage_n_gamma); // Voltage values of a waveform
 	outTree->Branch("v_gamma", &voltage_gamma);
-	outTree->Branch("h_ave_n_gamma", &h_ave_n_gamma); // Average heights of a waveform
+	outTree->Branch("h_ave_n_gamma", &h_ave_n_gamma); // Averaged heights of a waveform
 	outTree->Branch("h_ave_gamma", &h_ave_gamma);
 	outTree->Branch("integral_total_n_gamma", &integral_total_n_gamma); // Total/tail integral of a waveform, for different ranges.
 	outTree->Branch("integral_total_gamma", &integral_total_gamma);
 	outTree->Branch("integral_tail_n_gamma", &integral_tail_n_gamma);
 	outTree->Branch("integral_tail_gamma", &integral_tail_gamma);
-	outTree->Branch("min_total", &min_total); // Total/tail ranges to take integral
-	outTree->Branch("min_tail", &min_tail); 
-	outTree->Branch("max", &max); 
+	outTree->Branch("maximum_n_gamma", &maximum_n_gamma); // Maximum height of a waveform
+	outTree->Branch("maximum_gamma", &maximum_gamma); 
+	outTree->Branch("maximum_n_gamma_pos", &maximum_n_gamma_pos); // Maximum height of a waveform
+	outTree->Branch("maximum_gamma_pos", &maximum_gamma_pos); 
 	
 	//! Short window
-	int wf_charge_total_min = 145;
-	int wf_charge_total_max = 500;
-	int wf_charge_tail_min = 200;
-	int wf_charge_tail_min_final = 450;
+	// number of bins away from the maxima.
+	int total_minus_offset = 50.;  // The front
+	int total_plus_offset = 150;  // The end of the tail
+	
+	int tail_plus_offset_min = 50.; // Start of the tail
+	int tail_offset_incre = 1; // Increment for the start of the tail
+	int tail_plus_offset_max = 150; // Final value for the start of the tail
+
 	double baseline = 188.;
 	
 	//! Long window
@@ -148,9 +152,8 @@ void wf_pre_analyse_3()
 	// int wf_charge_tail_min_final = 2400;
 	// double baseline = 185.;
 
-	int wf_charge_tail_min_incre = 1;
 	// int wf_charge_tail_min_incre = 50;
-	int times = (wf_charge_tail_min_final-wf_charge_tail_min)/wf_charge_tail_min_incre;
+	int times = (tail_plus_offset_max-tail_plus_offset_min)/tail_offset_incre;
 	// std::cout << "times = " << times << "\n";
 
 	TString name;
@@ -216,9 +219,6 @@ void wf_pre_analyse_3()
 			}
 		}
 		#endif
-
-		int maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
-		int maximum_gamma = hist_temp_gamma->GetMaximum();
 
 		// Apply average
 		#ifdef APPLY_FIXED_AVERAGE
@@ -306,6 +306,11 @@ void wf_pre_analyse_3()
 		}
 		#endif
 		
+		maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
+		maximum_gamma = hist_temp_gamma->GetMaximum();
+		maximum_n_gamma_pos = hist_temp_n_gamma->GetMaximumBin();
+		maximum_gamma_pos = hist_temp_gamma->GetMaximumBin();
+
 		#ifdef NORMALIZE_WF
 		double scale_factor_n_gamma = n_wf_height/(maximum_n_gamma);
 		hist_temp_n_gamma->Scale(scale_factor_n_gamma, "noSW2");
@@ -325,33 +330,48 @@ void wf_pre_analyse_3()
 		int safe_bins = hist_temp_n_gamma->GetNbinsX();
 
 		// fixed bins intergration
-		for(int j = wf_charge_total_min; j < wf_charge_total_max; j++)
+		for(int j = maximum_n_gamma_pos-total_minus_offset; j < maximum_n_gamma_pos+total_plus_offset; j++)
 		{
-			if(j > safe_bins)
+			if(j < 0 || j > safe_bins)
 			{break;}
 			else
 			{
 				charge_total_n_gamma = charge_total_n_gamma + hist_temp_n_gamma->GetBinContent(j);
+			}
+		}
+		
+		for(int j = maximum_gamma_pos-total_minus_offset; j < maximum_gamma_pos+total_plus_offset; j++)
+		{
+			if(j < 0 || j > safe_bins)
+			{break;}
+			else
+			{
 				charge_total_gamma = charge_total_gamma + hist_temp_gamma->GetBinContent(j);
 			}
 		}
+
 		integral_total_n_gamma = charge_total_n_gamma;
 		integral_total_gamma = charge_total_gamma;
-		
-		min_total = wf_charge_total_min;
-		max = wf_charge_total_max;
-
-		int temp = wf_charge_tail_min;
+				
+		int temp = tail_plus_offset_min;
 		for (int iii = 0; iii < times; iii++)
 		{
-			wf_charge_tail_min += wf_charge_tail_min_incre;
-			for(int j = wf_charge_tail_min; j < wf_charge_total_max; j++)
+			tail_plus_offset_min += tail_offset_incre;
+			for(int j = maximum_n_gamma_pos+tail_plus_offset_min; j < maximum_n_gamma_pos+total_plus_offset; j++)
 			{
-				if(j > safe_bins)
+				if(j < 0 || j > safe_bins)
 				{break;}
 				else
 				{							
 					charge_tail_n_gamma = charge_tail_n_gamma + hist_temp_n_gamma->GetBinContent(j);
+				}
+			}
+			for(int j = maximum_gamma_pos+tail_plus_offset_min; j < maximum_gamma_pos+total_plus_offset; j++)
+			{
+				if(j < 0 || j > safe_bins)
+				{break;}
+				else
+				{
 					charge_tail_gamma = charge_tail_gamma + hist_temp_gamma->GetBinContent(j);
 				}
 			}
@@ -360,42 +380,17 @@ void wf_pre_analyse_3()
 			// sleep(1);
 			integral_tail_n_gamma.push_back(charge_tail_n_gamma);
 			integral_tail_gamma.push_back(charge_tail_gamma);
-			min_tail.push_back(wf_charge_tail_min);
 
 			charge_tail_n_gamma = 0.;
 			charge_tail_gamma = 0.;
 		}
-		wf_charge_tail_min = temp;
-		
+		tail_plus_offset_min = temp;
 		// std::cout << "integral_tail_n_gamma[0] = " << integral_tail_n_gamma[0] << "\n";
 		// std::cout << "integral_tail_gamma[0] = " << integral_tail_gamma[0] << "\n";
 		// sleep(1);
 		
 		q_ratio_n_gamma = charge_tail_n_gamma/charge_total_n_gamma;
 		q_ratio_gamma = charge_tail_gamma/charge_total_gamma;
-
-		#ifdef USE_SIGNAL_HEIGHT
-		charge_total_n_gamma = maximum_n_gamma;
-		charge_total_gamma = maximum_gamma;
-		#endif
-
-		#ifdef HEIGHT_THRESHOLD
-		if(maximum_n_gamma > height_threshold_n_gamma)
-		{
-			// hist_Q_ratio_n_gamma->Fill(charge_total_n_gamma, q_ratio_n_gamma);
-			// graph_Q_ratio_n_gamma->AddPoint(charge_total_n_gamma, q_ratio_n_gamma);
-		}
-		if(maximum_gamma > height_threshold_gamma)
-		{
-			// hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
-			// graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
-		}
-		#else
-		hist_Q_ratio_n_gamma->Fill(charge_total_n_gamma, q_ratio_n_gamma);
-		graph_Q_ratio_n_gamma->AddPoint(charge_total_n_gamma, q_ratio_n_gamma);
-		hist_Q_ratio_gamma->Fill(charge_total_gamma, q_ratio_gamma);
-		graph_Q_ratio_gamma->AddPoint(charge_total_gamma, q_ratio_gamma);
-		#endif
 
 		#ifdef DRAW_EACH_WF
 			//! Turn this on to check each waveforms
@@ -446,16 +441,14 @@ void wf_pre_analyse_3()
 		
 		integral_tail_n_gamma.clear();
 		integral_tail_gamma.clear();
-		min_tail.clear();
 	}
 
 	outTree->Write();
 	outFile->Close();
 
-	std::cout << "wf_charge_total_min = " << wf_charge_total_min << "\n";
-	std::cout << "wf_charge_total_max = " << wf_charge_total_max << "\n";
-	std::cout << "wf_charge_tail_min increases from = " << wf_charge_tail_min << " to "<< wf_charge_tail_min_final <<"\n";
-	std::cout << "with increment = " << wf_charge_tail_min_incre << "\n";
+	std::cout << "Total integration is from -" << total_minus_offset << " to +"<< total_plus_offset <<" from the wavefrom maxima.\n";
+	std::cout << "Tail integration is from +" << tail_plus_offset_min << " to +"<< total_plus_offset <<" from the wavefrom maxima.\n";
+	std::cout << "with increment = " << tail_offset_incre << "\n";
 
 	std::cout << "time: " << timer->RealTime() << " seconds \n";
 	

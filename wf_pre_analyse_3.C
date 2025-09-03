@@ -126,7 +126,7 @@ void wf_pre_analyse_3()
 	outTree->Branch("t_gamma", &time_gamma);
 	outTree->Branch("v_n_gamma", &voltage_n_gamma); // Voltage values of a waveform
 	outTree->Branch("v_gamma", &voltage_gamma);
-	outTree->Branch("h_ave_n_gamma", &h_ave_n_gamma); // Average heights of a waveform
+	outTree->Branch("h_ave_n_gamma", &h_ave_n_gamma); // Averaged heights of a waveform (voltage)
 	outTree->Branch("h_ave_gamma", &h_ave_gamma);
 	outTree->Branch("integral_total_n_gamma", &integral_total_n_gamma); // Total/tail integral of a waveform, for different ranges.
 	outTree->Branch("integral_total_gamma", &integral_total_gamma);
