@@ -51,13 +51,15 @@ void wf_pre_analyse_4()
 	//! Input local files
 
 	//! Short window
-	TFile* file_n_gamma = new TFile("~/data/wf_files/input/root_files/bc404_pu_c13_20250723-0002.root", "read");
+	// TFile* file_n_gamma = new TFile("~/data/wf_files/input/root_files/bc404_pu_c13_20250723-0002.root", "read");
+	TFile* file_n_gamma = new TFile("~/data/wf_files/input/root_files/stilbene_pu_c13_20250723-0004.root", "read");
 	
 	//! Long window
 	// TFile* file_n_gamma = new TFile("~/data/wf_files/input/root_files/bc404_pu_c13_200ps.root", "read");
 
 	//! Short window
-	TFile* file_gamma = new TFile("~/data/wf_files/input/root_files/bc404_na22_20250723.root", "read");
+	// TFile* file_gamma = new TFile("~/data/wf_files/input/root_files/bc404_na22_20250723.root", "read");
+	TFile* file_gamma = new TFile("~/data/wf_files/input/root_files/stilbene_na22_20250723-0003.root", "read");
 
 	//! Long window
 	// TFile* file_gamma = new TFile("~/data/wf_files/input/root_files/bc404_na22_20250725-0005.root", "read");
@@ -103,7 +105,7 @@ void wf_pre_analyse_4()
 	
 	std::cout << "Number of entries: " << n << "\n";
 
-	TFile* outFile = new TFile("BC404_wf.root","recreate");
+	TFile* outFile = new TFile("BC404_wf_maximum.root","recreate");
 	TTree* outTree = new TTree("tree","tree");
 
 	std::vector<double> h_ave_n_gamma;
@@ -131,7 +133,7 @@ void wf_pre_analyse_4()
 	outTree->Branch("integral_tail_gamma", &integral_tail_gamma);
 	outTree->Branch("maximum_n_gamma", &maximum_n_gamma); // Maximum height of a waveform
 	outTree->Branch("maximum_gamma", &maximum_gamma); 
-	outTree->Branch("maximum_n_gamma_pos", &maximum_n_gamma_pos); // Maximum height of a waveform
+	outTree->Branch("maximum_n_gamma_pos", &maximum_n_gamma_pos); // Position of the Maximum height of a waveform
 	outTree->Branch("maximum_gamma_pos", &maximum_gamma_pos); 
 	
 	//! Short window

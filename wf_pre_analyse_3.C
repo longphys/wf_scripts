@@ -17,7 +17,7 @@
 #include <iostream>
 
 // #define ORIGINAL_WF
-// #define DRAW_EACH_WF
+#define DRAW_EACH_WF
 #define APPLY_FIXED_AVERAGE
 // #define APPLY_MOVING_AVERAGE
 // #define NORMALIZE_WF
@@ -122,6 +122,9 @@ void wf_pre_analyse_3()
 	std::vector<double> min_tail;
 	double max;
 	
+	double maximum_n_gamma;
+	double maximum_gamma;
+	
 	outTree->Branch("t_n_gamma", &time_n_gamma); // Time values of a waveform
 	outTree->Branch("t_gamma", &time_gamma);
 	outTree->Branch("v_n_gamma", &voltage_n_gamma); // Voltage values of a waveform
@@ -135,6 +138,8 @@ void wf_pre_analyse_3()
 	outTree->Branch("min_total", &min_total); // Total/tail ranges to take integral
 	outTree->Branch("min_tail", &min_tail); 
 	outTree->Branch("max", &max); 
+	outTree->Branch("maximum_n_gamma", &maximum_n_gamma); // Maximum height of a waveform
+	outTree->Branch("maximum_gamma", &maximum_gamma); 
 	
 	//! Short window
 	int wf_charge_total_min = 145;
@@ -219,8 +224,8 @@ void wf_pre_analyse_3()
 		}
 		#endif
 
-		int maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
-		int maximum_gamma = hist_temp_gamma->GetMaximum();
+		maximum_n_gamma = hist_temp_n_gamma->GetMaximum();
+		maximum_gamma = hist_temp_gamma->GetMaximum();
 
 		// Apply average
 		#ifdef APPLY_FIXED_AVERAGE
