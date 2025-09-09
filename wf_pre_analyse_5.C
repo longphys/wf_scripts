@@ -20,7 +20,7 @@
 // #define DRAW_EACH_WF
 #define APPLY_FIXED_AVERAGE
 // #define APPLY_MOVING_AVERAGE
-#define NORMALIZE_WF
+// #define NORMALIZE_WF
 
 //! Short window
 const int n_wf = 2000;
