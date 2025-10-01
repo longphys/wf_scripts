@@ -60,6 +60,9 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "res.C": "cpp"
+        "res.C": "cpp",
+        "make_list.C": "cpp",
+        "read_csv_1.C": "cpp",
+        "draw_wf.C": "cpp"
     }
 }

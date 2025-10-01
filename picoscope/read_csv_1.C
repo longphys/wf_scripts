@@ -16,14 +16,8 @@
 #define LINES_TO_SKIP 3
 //#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
-// #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_cs137_20250725-0006.txt"
-// #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_bc404_pu_c13_20250723-0002.txt"
-// #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_stilbene_pu_c13_20250723-0004.txt"
-#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_stilbene_na22_20250723-0003.txt"
-// #define OUTROOT "/home/long/data/wf_files/input/root_files/bc404_cs137_20250725-0006.root"
-// #define OUTROOT "/home/long/data/wf_files/input/root_files/stilbene_pu_c13_20250723-0004.root"
-#define OUTROOT "/home/long/data/wf_files/input/root_files/stilbene_na22_20250723-0003.root"
-// #define OUTROOT "./test_wf.root"
+#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_co60_30092025.txt"
+#define OUTROOT "/home/long/data/wf_files/input/root_files/gagg_co60_30092025.root"
 
 using std::fstream;
 using std::string;
