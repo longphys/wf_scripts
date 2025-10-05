@@ -63,6 +63,22 @@
         "res.C": "cpp",
         "make_list.C": "cpp",
         "read_csv_1.C": "cpp",
-        "draw_wf.C": "cpp"
+        "draw_wf.C": "cpp",
+        "calib.C": "cpp",
+        "*.icc": "cpp",
+        "f2plot": "cpp",
+        "gl2ps": "cpp",
+        "img": "cpp",
+        "back_area": "cpp",
+        "base_text": "cpp",
+        "cube": "cpp",
+        "event": "cpp",
+        "ortho": "cpp",
+        "plots": "cpp",
+        "plotter": "cpp",
+        "tex_rect": "cpp",
+        "viewer": "cpp",
+        "*.icxx": "cpp",
+        "calib1.C": "cpp"
     }
 }

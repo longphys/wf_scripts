@@ -5,11 +5,12 @@
 
 void make_list() {
     // --- settings ---
-    TString out_txt = "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_co60_30092025.txt";
-    TString base_dir = "/home/long/data/wf_files/picoscope/gagg_co60_725V_30092025-0005/gagg_co60_725V_30092025-0005/";
-    TString prefix   = "gagg_co60_725V_30092025-0005_";
+    TString out_txt = "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_na22_30092025.txt";
+    TString base_dir = "/home/long/data/wf_files/picoscope/gagg_na22_725V_30092025-0004/gagg_na22_725V_30092025-0004/";
+    TString prefix   = "gagg_na22_725V_30092025-0004_";
     int first_idx    = 1;
-    int last_idx     = 100000;  // change to however many files you have
+    // int last_idx     = 32760;  // change to however many files you have
+    int last_idx     = 45521;  // change to however many files you have
     TString ext      = ".csv";
 
     // --- open output file ---

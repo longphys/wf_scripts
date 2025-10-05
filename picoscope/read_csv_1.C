@@ -14,10 +14,13 @@
 
 // Code parameters
 #define LINES_TO_SKIP 3
-//#define BASELINE 180
 #define DELIM ','  // We use ',' to separate values
-#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_co60_30092025.txt"
-#define OUTROOT "/home/long/data/wf_files/input/root_files/gagg_co60_30092025.root"
+#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_na22_30092025.txt"
+#define OUTROOT "/home/long/data/wf_files/input/root_files/gagg_na22_30092025_1.root"
+
+//! REMEMBER TO CHANGE THE BASELINE
+double baseline = 390.; //gagg
+// double baseline = 180.; //csi
 
 using std::fstream;
 using std::string;
@@ -144,9 +147,10 @@ int read_csv_1() {
                     
                 }
             }
-            for (int iii = 0; iii <(int)vVoltage.size(); iii++)
+            // for (int iii = 0; iii <(int)vVoltage.size(); iii++)
+            for (int iii = 1500; iii <(int)vVoltage.size()-1400; iii++)
             {
-                integral+=190.-vVoltage.at(iii);
+                integral+=baseline-vVoltage.at(iii);
             }            
         }
         archive.close();
