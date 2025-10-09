@@ -15,12 +15,14 @@
 // Code parameters
 #define LINES_TO_SKIP 3
 #define DELIM ','  // We use ',' to separate values
-#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_gagg_na22_30092025.txt"
-#define OUTROOT "/home/long/data/wf_files/input/root_files/gagg_na22_30092025_1.root"
+#define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_csi_na22_08102025.txt"
+// #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_csi_co60_08102025.txt"
+#define OUTROOT "/home/long/data/wf_files/input/root_files/csi_na22_08102025.root"
+// #define OUTROOT "/home/long/data/wf_files/input/root_files/csi_co60_08102025.root"
 
 //! REMEMBER TO CHANGE THE BASELINE
-double baseline = 390.; //gagg
-// double baseline = 180.; //csi
+// double baseline = 300.; //gagg
+double baseline = 160.; //csi
 
 using std::fstream;
 using std::string;
@@ -146,14 +148,17 @@ int read_csv_1() {
                 catch (...) {
                     
                 }
-            }
-            // for (int iii = 0; iii <(int)vVoltage.size(); iii++)
-            for (int iii = 1500; iii <(int)vVoltage.size()-1400; iii++)
-            {
-                integral+=baseline-vVoltage.at(iii);
-            }            
+            }     
         }
         archive.close();
+
+        for (int iii = 0; iii <(int)vVoltage.size(); iii++)
+        // for (int iii = 1500; iii <(int)vVoltage.size()-1400; iii++)
+        // for (int iii = 1500; iii <2500; iii++)
+        // for (int iii = 3700; iii <10000; iii++)
+        {
+            integral+=baseline-vVoltage.at(iii);
+        }       
 
         // 8. Fill tree
         tree->Fill();

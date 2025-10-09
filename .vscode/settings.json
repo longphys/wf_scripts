@@ -79,6 +79,7 @@
         "tex_rect": "cpp",
         "viewer": "cpp",
         "*.icxx": "cpp",
-        "calib1.C": "cpp"
+        "calib1.C": "cpp",
+        "cali_Li6_test.C": "cpp"
     }
 }
