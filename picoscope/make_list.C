@@ -5,12 +5,16 @@
 
 void make_list() {
     // --- settings ---
-    TString out_txt = "/home/long/scripts/wf_scripts/picoscope/lists/list_csi_na22_08102025.txt";
-    TString base_dir = "/home/long/data/wf_files/picoscope/new/csi_na22_08102025/csi_na22_08102025/";
-    TString prefix   = "csi_na22_08102025_";
+    TString out_txt = "/home/user/data/list_new.txt";
+    // TString base_dir = "/home/user/data/20251030_56V_1250MS/";
+    // TString base_dir = "/home/user/data/20251030_58V_1250MS_128/";
+    TString base_dir = "/home/user/data/20251030_58V_1250MS_132/";
+    // TString prefix   = "20251030_56V_1250MS_";
+    // TString prefix   = "20251030_58V_1250MS_128_";
+    TString prefix   = "20251030_58V_1250MS_132_";
     int first_idx    = 1;
     // int last_idx     = 32760;  // change to however many files you have
-    int last_idx     = 50000;  // change to however many files you have
+    int last_idx     = 5063;  // change to however many files you have
     TString ext      = ".csv";
 
     // --- open output file ---
@@ -24,7 +28,8 @@ void make_list() {
     for (int i = first_idx; i <= last_idx; i++) {
         outfile << base_dir
                 << prefix
-                << std::setw(5) << std::setfill('0') << i
+                // << std::setw(5) << std::setfill('0') << i
+                << std::setw(4) << std::setfill('0') << i
                 << ext << std::endl;
     }
 
