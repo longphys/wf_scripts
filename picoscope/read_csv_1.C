@@ -15,11 +15,11 @@
 // Code parameters
 #define LINES_TO_SKIP 3
 #define DELIM ','  // We use ',' to separate values
-#define INLIST "/home/user/data/list_new.txt"
+#define INLIST "/home/long/data/list_new.txt"
 // #define INLIST "/home/long/scripts/wf_scripts/picoscope/lists/list_csi_co60_08102025.txt"
-// #define OUTROOT "~/data/56V_1250MS.root"
+#define OUTROOT "~/data/wf_files/input/root_files/56V_1250MS.root"
 // #define OUTROOT "~/data/58V_1250MS_128.root"
-#define OUTROOT "~/data/58V_1250MS_132.root"
+// #define OUTROOT "~/data/58V_1250MS_132.root"
 // #define OUTROOT "/home/long/data/wf_files/input/root_files/csi_co60_08102025.root"
 
 //! REMEMBER TO CHANGE THE BASELINE
@@ -111,7 +111,7 @@ int read_csv_1() {
 
         // 5. Process data
         map<string, size_t> indiceColumns;
-        size_t idx_time = 0, idx_voltage_1 = 1, idx_voltage_2 = 1; // Default values
+        size_t idx_time = 0, idx_voltage_1 = 1, idx_voltage_2 = 2; // Default values
         
         if (getline(archive, line)) {
             // Parse headers
@@ -129,7 +129,7 @@ int read_csv_1() {
             if (indiceColumns.find("Time") != indiceColumns.end() && 
                 indiceColumns.find("ChannelA") != indiceColumns.end() &&
                 indiceColumns.find("ChannelB") != indiceColumns.end()) {
-                idx_time = indiceColumns["<Time"];
+                idx_time = indiceColumns["Time"];
                 idx_voltage_1 = indiceColumns["ChannelA"];
                 idx_voltage_2 = indiceColumns["ChannelB"];
             }

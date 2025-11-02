@@ -80,6 +80,8 @@
         "viewer": "cpp",
         "*.icxx": "cpp",
         "calib1.C": "cpp",
-        "cali_Li6_test.C": "cpp"
+        "cali_Li6_test.C": "cpp",
+        "analyse.C": "cpp",
+        "wf_pre_analyse_5.C": "cpp"
     }
 }

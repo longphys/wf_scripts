@@ -5,16 +5,12 @@
 
 void make_list() {
     // --- settings ---
-    TString out_txt = "/home/user/data/list_new.txt";
-    // TString base_dir = "/home/user/data/20251030_56V_1250MS/";
-    // TString base_dir = "/home/user/data/20251030_58V_1250MS_128/";
-    TString base_dir = "/home/user/data/20251030_58V_1250MS_132/";
-    // TString prefix   = "20251030_56V_1250MS_";
-    // TString prefix   = "20251030_58V_1250MS_128_";
-    TString prefix   = "20251030_58V_1250MS_132_";
+    TString out_txt = "/home/long/data/list_new.txt";
+    TString base_dir = "/home/long/data/wf_files/input/20251030_56V_1250MS/";
+    TString prefix   = "20251030_56V_1250MS_";
     int first_idx    = 1;
     // int last_idx     = 32760;  // change to however many files you have
-    int last_idx     = 5063;  // change to however many files you have
+    int last_idx     = 5037;  // change to however many files you have
     TString ext      = ".csv";
 
     // --- open output file ---
