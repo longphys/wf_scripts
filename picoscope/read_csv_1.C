@@ -69,6 +69,8 @@ int read_csv_1() {
     vector<float> vVoltage_2;
     double integral_1;
     double integral_2;
+    double height_1;
+    double height_2;
 
     TFile* outputFile = new TFile(OUTROOT, "recreate");
     
@@ -79,6 +81,8 @@ int read_csv_1() {
     tree->Branch("Voltage_2", &vVoltage_2);
     tree->Branch("Integral_1", &integral_1, "Integral_1/D");
     tree->Branch("Integral_2", &integral_2, "Integral_2/D");
+    tree->Branch("Height_1", &height_1, "Height_1/D");
+    tree->Branch("Height_2", &height_2, "Height_2/D");
 
     #ifdef DEBUG
         TCanvas* cnCommon = new TCanvas("cnCommon", "cnCommon", 700, 700);
@@ -166,6 +170,8 @@ int read_csv_1() {
         }
         archive.close();
 
+        double max_1 = -1e6;
+        double max_2 = -1e6;
         for (int iii = 0; iii <(int)vVoltage_1.size(); iii++)
         // for (int iii = 1500; iii <(int)vVoltage.size()-1400; iii++)
         // for (int iii = 1500; iii <2500; iii++)
@@ -173,14 +179,28 @@ int read_csv_1() {
         {
             // integral_1+=baseline-vVoltage_1.at(iii);
             // integral_2+=baseline-vVoltage_2.at(iii);
-            integral_1+=vVoltage_1.at(iii)-baseline;
-            integral_2+=vVoltage_2.at(iii)-baseline;
+            double value_1 = vVoltage_1.at(iii)-baseline;
+            double value_2 = vVoltage_2.at(iii)-baseline;
+
+            if(value_1 > max_1){
+                max_1 = value_1;
+            }
+            if(value_2 > max_2){
+                max_2 = value_2;
+            }
+            integral_1+=value_1;
+            integral_2+=value_2;
         }       
+
+        height_1 = max_1;
+        height_2 = max_2;
 
         // 8. Fill tree
         tree->Fill();
         integral_1 = 0.;
         integral_2 = 0.;
+        height_1 = 0.;
+        height_2 = 0.;
     }
 
     // 9. Save and close
