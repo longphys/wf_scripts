@@ -81,7 +81,10 @@
         "*.icxx": "cpp",
         "calib1.C": "cpp",
         "cali_Li6_test.C": "cpp",
+<<<<<<< HEAD
         "analyse.C": "cpp",
+=======
+>>>>>>> 5802093 (commit)
         "wf_pre_analyse_5.C": "cpp"
     }
 }
